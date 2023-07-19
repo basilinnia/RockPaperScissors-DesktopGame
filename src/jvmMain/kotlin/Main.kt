@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import theme.AppTheme
+import theme.Nunito
 
 @Composable
 @Preview
@@ -63,12 +64,14 @@ fun MainScreen(navigateToGameScreen: ()-> Unit ) {
                 Text(
                     color = Color.White,
                     fontSize = 22.sp,
+                    fontFamily = Nunito,
                     fontWeight = FontWeight.Bold,
                     text = "PLAY"
                 )
             }
             Text(
-                fontSize = 38.sp,
+                fontSize = 32.sp,
+                fontFamily = Nunito,
                 fontWeight = FontWeight.Bold,
                 text = "Rock Paper Scissors \nwith Compose"
             )

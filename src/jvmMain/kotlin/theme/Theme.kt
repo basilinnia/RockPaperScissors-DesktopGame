@@ -11,8 +11,9 @@ val LightTheme = lightColors(
     surface = Color(0xffD9D9D9),
     onSurface  = Color(0xff070A52),
     primary = Color(0xffDF2E38),
-    onPrimary = Color.White,
     secondaryVariant = Color.Black,
+    onPrimary = Color.White,
+    onSecondary = Color(0xffAF2D2D)
 )
 
 val DarkTheme = darkColors(
@@ -21,6 +22,7 @@ val DarkTheme = darkColors(
     primary = Color(0xff2751A3),
     onPrimary = Color.White,
     secondaryVariant = Color.White,
+    onSecondary =Color(0xff6881D8)
 )
 
 
