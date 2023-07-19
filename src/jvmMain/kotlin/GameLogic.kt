@@ -4,16 +4,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.MaterialTheme.colors
+import androidx.compose.runtime.*
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,10 +18,15 @@ import androidx.compose.ui.unit.sp
 import theme.Nunito
 import theme.RedHatDisplay
 import theme.SignikaNegative
-import javax.xml.transform.Source
 
+val moves = listOf("ROCK", "PAPER", "SCISSORS")
 @Composable
 fun GameScreen(navigateToMainScreen: () -> Unit) {
+    val (playerMove, setPlayerMove) = remember { mutableStateOf("ROCK") }
+    val computerMove = remember{mutableStateOf("ROCK")}
+    val playerScore = remember { mutableStateOf(0) }
+    val computerScore = remember { mutableStateOf(0) }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = navigateToMainScreen) {
@@ -43,7 +45,10 @@ fun GameScreen(navigateToMainScreen: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                TextButton(onClick = {}) {
+                TextButton(onClick = {
+                    playerScore.value = 0
+                    computerScore.value = 0
+                }) {
                     Text(
                         color = colors.secondaryVariant,
                         fontFamily = SignikaNegative,
@@ -59,41 +64,47 @@ fun GameScreen(navigateToMainScreen: () -> Unit) {
                     Text(
                         fontFamily = RedHatDisplay,
                         color = colors.secondaryVariant,
-                        text = "PLAYER SCORE: ",
+                        text = "PLAYER SCORE: ${playerScore.value}",
                         fontSize = 15.sp
                     )
                     Text(
                         fontFamily = RedHatDisplay,
                         modifier = Modifier.padding(start = 120.dp),
                         color = colors.secondaryVariant,
-                        text = "COMPUTER SCORE: ",
+                        text = "COMPUTER SCORE: ${computerScore.value}",
                         fontSize = 15.sp
                     )
                 }
             }
-            Message()
-            CurrentMove()
-            Moves()
+            Message(playerMove, computerMove.value) {winner ->
+                if (winner == "computer") {
+                    computerScore.value += 1
+                } else if (winner == "player") {
+                    playerScore.value += 1
+                }
+            }
+            CurrentMove(playerMove,computerMove.value)
+            Moves(setPlayerMove, computerMove)
         }
     }
 }
 
 
 @Composable
-fun CurrentMove() {
+fun CurrentMove(playerMove: String, computerMove:String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(painter = painterResource("moves/rock.svg"),
+        Image(painter = painterResource("moves/$playerMove.svg"),
             contentDescription = null,
             modifier = Modifier.size(230.dp),
             colorFilter = ColorFilter.tint(colors.secondaryVariant)
             )
         Text(fontWeight = FontWeight.ExtraBold, fontFamily = Nunito, text = "VS")
         Image(
-            painter = painterResource("moves/paper.svg"),
+            painter = painterResource("moves/${computerMove}.svg"),
             contentDescription = null,
             colorFilter = ColorFilter.tint(colors.secondaryVariant),
             modifier = Modifier.size(230.dp).rotate(180f)
@@ -102,14 +113,17 @@ fun CurrentMove() {
 }
 
 @Composable
-fun Moves() {
+fun Moves(setMove: (String) -> Unit, computerMove: MutableState<String>) {
     Text("Choose your move, rock paper or scissors?", color = Color.Gray)
 
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 25.dp), horizontalArrangement = Arrangement.SpaceAround) {
-        for (move in listOf("ROCK", "PAPER", "SCISSORS")) {
+        for (move in moves) {
             Button(
                 shape = RoundedCornerShape(14),
-                onClick = { /* Add onClick action here */ },
+                onClick = {
+                    setMove(move)
+                    computerMove.value = moves.random()
+                },
                 modifier = Modifier.size(180.dp, 60.dp)
             ) {
                 Text(fontWeight = FontWeight.ExtraBold, fontFamily = Nunito, text = move)
@@ -119,6 +133,20 @@ fun Moves() {
 }
 
 @Composable
-fun Message() {
-    Text("YOU WON\uD83C\uDF89!", fontFamily = RedHatDisplay, fontSize = 46.sp, fontWeight = FontWeight.Bold, color = colors.onSecondary)
+fun Message(playerMove: String, computerMove: String, updateScores: (String) -> Unit) {
+    var text = " "
+    when (playerMove) {
+        "ROCK" ->  text = if (computerMove == "ROCK") "DRAW" else if(computerMove == "PAPER") "COMPUTER WON\uD83C\uDF89!"   else "YOU WON\uD83C\uDF89!"
+        "PAPER" -> text = if (computerMove == "PAPER") "DRAW" else if(computerMove == "SCISSORS") "COMPUTER WON\uD83C\uDF89!" else "YOU WON\uD83C\uDF89!"
+        "SCISSORS" -> text = if (computerMove == "SCISSORS") "DRAW" else if(computerMove == "ROCK") "COMPUTER WON\uD83C\uDF89!" else "YOU WON\uD83C\uDF89!"
+    }
+    LaunchedEffect(text) {
+        if (text == "COMPUTER WON\uD83C\uDF89!") {
+            updateScores("computer")
+        } else if (text == "YOU WON\uD83C\uDF89!") {
+            updateScores("player")
+        }
+    }
+
+    Text(text, fontFamily = RedHatDisplay, fontSize = 46.sp, fontWeight = FontWeight.Bold, color = colors.onSecondary)
 }
