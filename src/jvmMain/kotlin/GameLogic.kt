@@ -25,18 +25,23 @@ import javax.xml.transform.Source
 
 @Composable
 fun GameScreen(navigateToMainScreen: () -> Unit) {
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp, vertical = 15.dp), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = navigateToMainScreen) {
-                    Icon(Icons.Outlined.ArrowBack, contentDescription = "back")
-                }
-                Text(
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 26.sp,
-                    text = "Rock Paper Scissors with Compose",
-                    fontFamily = Nunito
-                )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = navigateToMainScreen) {
+                Icon(Icons.Outlined.ArrowBack, contentDescription = "back")
             }
+            Text(
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 26.sp,
+                text = "Rock Paper Scissors with Compose",
+                fontFamily = Nunito
+            )
+        }
+        Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp, vertical = 15.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 TextButton(onClick = {}) {
                     Text(
@@ -71,6 +76,7 @@ fun GameScreen(navigateToMainScreen: () -> Unit) {
             Moves()
         }
     }
+}
 
 
 @Composable
@@ -99,7 +105,7 @@ fun CurrentMove() {
 fun Moves() {
     Text("Choose your move, rock paper or scissors?", color = Color.Gray)
 
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 25.dp), horizontalArrangement = Arrangement.SpaceAround) {
         for (move in listOf("ROCK", "PAPER", "SCISSORS")) {
             Button(
                 shape = RoundedCornerShape(14),

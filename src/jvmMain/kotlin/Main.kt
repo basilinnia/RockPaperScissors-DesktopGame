@@ -10,10 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import theme.AppTheme
 import theme.Nunito
 
@@ -25,11 +27,11 @@ fun App() {
 
     AppTheme(isDark = themeState.value) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(vertical = 16.dp),
             contentAlignment = Alignment.TopEnd
         ) {
             IconButton(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(horizontal = 16.dp),
                 onClick = ({ themeState.value = !themeState.value })
             ) {
                 Icon(
@@ -79,7 +81,9 @@ fun MainScreen(navigateToGameScreen: ()-> Unit ) {
     }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "Rock Paper Scissors") {
+    Window(onCloseRequest = ::exitApplication, title = "Rock Paper Scissors", state = rememberWindowState(size = DpSize(width = 800.dp, height = 650.dp)) // Set the window size here
+
+    ) {
         App()
     }
 }
