@@ -76,15 +76,9 @@ fun GameScreen(navigateToMainScreen: () -> Unit) {
                     )
                 }
             }
-            Message(playerMove, computerMove.value) {winner ->
-                if (winner == "computer") {
-                    computerScore.value += 1
-                } else if (winner == "player") {
-                    playerScore.value += 1
-                }
-            }
+            Text(getWinner(playerMove, computerMove.value), fontFamily = RedHatDisplay, fontSize = 46.sp, fontWeight = FontWeight.Bold, color = colors.onSecondary)
             CurrentMove(playerMove,computerMove.value)
-            Moves(setPlayerMove, computerMove)
+            Moves(setPlayerMove, computerMove, playerScore, computerScore)
         }
     }
 }
@@ -113,7 +107,7 @@ fun CurrentMove(playerMove: String, computerMove:String) {
 }
 
 @Composable
-fun Moves(setMove: (String) -> Unit, computerMove: MutableState<String>) {
+fun Moves(setMove: (String) -> Unit, computerMove: MutableState<String>, playerScore:MutableState<Int>, computerScore:MutableState<Int>) {
     Text("Choose your move, rock paper or scissors?", color = Color.Gray)
 
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 25.dp), horizontalArrangement = Arrangement.SpaceAround) {
@@ -123,6 +117,7 @@ fun Moves(setMove: (String) -> Unit, computerMove: MutableState<String>) {
                 onClick = {
                     setMove(move)
                     computerMove.value = moves.random()
+                    updateScores(getWinner(move, computerMove.value), playerScore, computerScore)
                 },
                 modifier = Modifier.size(180.dp, 60.dp)
             ) {
@@ -132,21 +127,19 @@ fun Moves(setMove: (String) -> Unit, computerMove: MutableState<String>) {
     }
 }
 
-@Composable
-fun Message(playerMove: String, computerMove: String, updateScores: (String) -> Unit) {
-    var text = " "
-    when (playerMove) {
-        "ROCK" ->  text = if (computerMove == "ROCK") "DRAW" else if(computerMove == "PAPER") "COMPUTER WON\uD83C\uDF89!"   else "YOU WON\uD83C\uDF89!"
-        "PAPER" -> text = if (computerMove == "PAPER") "DRAW" else if(computerMove == "SCISSORS") "COMPUTER WON\uD83C\uDF89!" else "YOU WON\uD83C\uDF89!"
-        "SCISSORS" -> text = if (computerMove == "SCISSORS") "DRAW" else if(computerMove == "ROCK") "COMPUTER WON\uD83C\uDF89!" else "YOU WON\uD83C\uDF89!"
+fun getWinner(playerMove: String, computerMove: String): String {
+    return when {
+        playerMove == computerMove -> "DRAW"
+        (playerMove == "ROCK" && computerMove == "SCISSORS") ||
+                (playerMove == "PAPER" && computerMove == "ROCK") ||
+                (playerMove == "SCISSORS" && computerMove == "PAPER") -> "YOU WON\uD83C\uDF89!"
+        else -> "COMPUTER WON\uD83C\uDF89!"
     }
-    LaunchedEffect(text) {
-        if (text == "COMPUTER WON\uD83C\uDF89!") {
-            updateScores("computer")
-        } else if (text == "YOU WON\uD83C\uDF89!") {
-            updateScores("player")
-        }
-    }
+}
 
-    Text(text, fontFamily = RedHatDisplay, fontSize = 46.sp, fontWeight = FontWeight.Bold, color = colors.onSecondary)
+fun updateScores(winner: String, playerScore:MutableState<Int>, computerScore:MutableState<Int>) {
+    when (winner) {
+        "YOU WON\uD83C\uDF89!"-> playerScore.value += 1
+        "COMPUTER WON\uD83C\uDF89!"->computerScore.value += 1
+    }
 }
